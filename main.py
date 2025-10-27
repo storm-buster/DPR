@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 import time
 
 from app.core.config import settings
-from app.services.user_service import user_service
+# from app.services.user_service import user_service  # Disabled - uses MongoDB
 from app.models.enums import UserRole
 from app.api.auth import router as auth_router
 
