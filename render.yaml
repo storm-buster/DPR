@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: sameekshaai-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python run.py
+    envVars:
+      - key: GEMINI_API_KEY
+        value: AIzaSyCf8PZ4jxCYXHM4cTq8U4nAzKMFfCvTbIo
+      - key: SECRET_KEY
+        value: super-secret-production-key-change-this
+      - key: MONGODB_URL
+        value: mongodb+srv://sterben:Avinash%40123@cluster1.nkxlyxt.mongodb.net/dpr_system?retryWrites=true&w=majority&appName=Cluster1
+      - key: ALLOWED_HOSTS
+        value: '["*"]'
+      - key: PORT
+        sync: false

@@ -11,18 +11,14 @@ from app.api.auth import router as auth_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Initialize MongoDB database
-    print("🚀 Initializing MongoDB database...")
+    # Skip MongoDB - using in-memory storage only
+    print("🚀 Starting backend in in-memory mode...")
     try:
-        from app.core.database import init_database
-        await init_database()
-        print("✅ MongoDB connection established")
         
-        # Create test users if database is available
-        from app.core.database import get_database
-        database = get_database()
+        # Create test users in memory
+        database = None
         
-        if database:
+        if False:  # Skip MongoDB user creation
             from app.models.user import User
             from app.models.enums import UserRole
             from app.core.security import get_password_hash
@@ -36,11 +32,11 @@ async def lifespan(app: FastAPI):
                         email="state@example.com",
                         password_hash=get_password_hash("password123"),
                         role=UserRole.STATE_USER,
-                        department="Roads",
-                        state="Maharashtra"
+                        department="Public Works Department",
+                        state="Arunachal Pradesh"
                     )
                     await state_user.insert()
-                    print("✅ Created State user")
+                    print("✅ Created State user (Arunachal Pradesh)")
                 
                 mdoner_user = await User.find_one({"username": "mdoner_user"})
                 if not mdoner_user:
@@ -59,36 +55,36 @@ async def lifespan(app: FastAPI):
                 
                 existing_projects = await Project.find().to_list()
                 if not existing_projects:
-                    # Sample project 1 - Draft
+                    # Sample project 1 - Trans-Arunachal Highway
                     project1 = Project(
-                        name="Highway Expansion Project",
-                        description="Expansion of NH-48 from 4-lane to 6-lane highway",
+                        name="Trans-Arunachal Highway Development",
+                        description="Construction of 85km all-weather highway connecting remote villages in Tawang district",
                         project_type=ProjectType.INFRASTRUCTURE,
-                        department="Roads",
-                        state="Maharashtra",
+                        department="Public Works Department",
+                        state="Arunachal Pradesh",
                         created_by=str(state_user.id)
                     )
                     await project1.insert()
                     
-                    # Sample project 2 - Concept Submitted
+                    # Sample project 2 - Healthcare Center
                     project2 = Project(
-                        name="Rural Water Supply Scheme",
-                        description="Providing clean water access to 50 villages",
-                        project_type=ProjectType.DEVELOPMENT,
-                        department="Water Resources",
-                        state="Maharashtra",
+                        name="Integrated Healthcare Center - Itanagar",
+                        description="Establishment of 100-bed integrated healthcare facility with modern equipment",
+                        project_type=ProjectType.HEALTH,
+                        department="Health & Family Welfare",
+                        state="Arunachal Pradesh",
                         created_by=str(state_user.id),
                         status=ProjectStatus.CONCEPT_SUBMITTED
                     )
                     await project2.insert()
                     
-                    # Sample project 3 - Concept Approved
+                    # Sample project 3 - Skill Development
                     project3 = Project(
-                        name="Primary School Infrastructure",
-                        description="Building new classrooms and facilities",
+                        name="Skill Development Center - Pasighat",
+                        description="Multi-skill training center for youth employment in tourism and handicrafts",
                         project_type=ProjectType.EDUCATION,
-                        department="Education",
-                        state="Maharashtra",
+                        department="Skill Development",
+                        state="Arunachal Pradesh",
                         created_by=str(state_user.id),
                         status=ProjectStatus.CONCEPT_APPROVED,
                         concept_note_approved=True
@@ -107,18 +103,15 @@ async def lifespan(app: FastAPI):
         print("MDONER User - Username: mdoner_user, Password: password123")
         
     except Exception as e:
-        print(f"❌ Database initialization failed: {e}")
-        raise
+        print(f"⚠️ Startup warning: {e}")
+        # Don't raise - continue without MongoDB
+    
+    print("✅ Backend started successfully in in-memory mode")
     
     yield
     
     # Cleanup
-    try:
-        from app.core.database import close_database
-        await close_database()
-        print("✅ MongoDB connection closed")
-    except Exception as e:
-        print(f"⚠️ Error closing database: {e}")
+    print("✅ Backend shutdown")
 
 
 app = FastAPI(
